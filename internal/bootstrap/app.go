@@ -1,0 +1,27 @@
+package bootstrap
+
+import (
+	"userAuth/internal/platform/postgres"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type App struct {
+	DB *pgxpool.Pool
+}
+
+func Initialize() (*App, error) {
+	db, err := postgres.NewPool()
+	if err != nil {
+		return nil, err
+	}
+	return &App{
+		DB: db,
+	}, nil
+}
+
+func (a *App) Close() {
+	if a.DB != nil {
+		a.DB.Close()
+	}
+}
