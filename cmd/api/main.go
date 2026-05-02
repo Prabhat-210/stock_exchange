@@ -8,7 +8,9 @@ import (
 
 func main() {
 	ctx := context.Background()
+
 	app, err := bootstrap.Initialize(ctx)
+	
 	if err != nil {
 		log.Fatalf("Unable to initialize db %v", err)
 	}
