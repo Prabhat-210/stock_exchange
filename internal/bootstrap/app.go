@@ -16,6 +16,7 @@ func Initialize(ctx context.Context) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+	
 	return &App{
 		DB: db,
 	}, nil
