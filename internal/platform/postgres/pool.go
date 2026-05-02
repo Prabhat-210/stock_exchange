@@ -17,7 +17,7 @@ Instead of opening a new DB connection for every query, pgxpool.Pool:
 So your app talks to the pool.
 ---------------------------------------------------------------------
 */
-func NewPool() (*pgxpool.Pool, error) {
+func NewPool(ctx context.Context) (*pgxpool.Pool, error) {
 	cfg, err := pgxpool.ParseConfig(dsn())
 	if err != nil {
 		return nil, fmt.Errorf("parse postgres config: %w", err)
@@ -31,9 +31,6 @@ func NewPool() (*pgxpool.Pool, error) {
 	cfg.HealthCheckPeriod = 1 * time.Minute
 	cfg.ConnConfig.ConnectTimeout = 5 * time.Second
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-
-	defer cancel()
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect with pool:%w ", err)
@@ -41,7 +38,7 @@ func NewPool() (*pgxpool.Pool, error) {
 	if err := pool.Ping(ctx); err != nil {
 		return nil, fmt.Errorf("ping postgres: %w", err)
 	}
-	return pool, err
+	return pool, nil
 }
 
 func dsn() string { //data source name

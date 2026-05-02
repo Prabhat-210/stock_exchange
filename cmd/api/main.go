@@ -1,15 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"userAuth/internal/bootstrap"
 )
 
 func main() {
-	app, err := bootstrap.Initialize()
+	ctx := context.Background()
+	app, err := bootstrap.Initialize(ctx)
 	if err != nil {
-		fmt.Errorf("Unable to initialize db %w", err)
+		log.Fatalf("Unable to initialize db %v", err)
 	}
 	defer app.Close()
 
