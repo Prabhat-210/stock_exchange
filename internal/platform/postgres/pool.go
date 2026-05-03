@@ -20,7 +20,7 @@ So your app talks to the pool.
 */
 func NewPool(ctx context.Context) (*pgxpool.Pool, error) {
 	log := logger.FromContext(ctx)
-	cfg, err := pgxpool.ParseConfig(dsn())
+	cfg, err := pgxpool.ParseConfig(DSN())
 	if err != nil {
 		return nil, fmt.Errorf("parse postgres config: %w", err)
 	}
@@ -49,6 +49,6 @@ func NewPool(ctx context.Context) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func dsn() string { //data source name
+func DSN() string { //data source name
 	return "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
 }

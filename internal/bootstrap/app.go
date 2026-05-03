@@ -6,6 +6,8 @@ import (
 	"userAuth/internal/platform/postgres"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"userAuth/internal/platform/migrations"
 )
 
 type App struct {
@@ -14,6 +16,9 @@ type App struct {
 
 func Initialize(ctx context.Context) (*App, error) {
 	log := logger.FromContext(ctx)
+	if err := migrations.Migrate(postgres.DSN(), 5); err != nil {
+		return nil, err
+	}
 	db, err := postgres.NewPool(ctx)
 	if err != nil {
 		log.Error().Msg("Failed to intialize postgres")
