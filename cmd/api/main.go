@@ -2,19 +2,28 @@ package main
 
 import (
 	"context"
-	"log"
 	"userAuth/internal/bootstrap"
+	"userAuth/internal/platform/logger"
 )
 
 func main() {
-	ctx := context.Background()
+
+	log := logger.NewLogger(logger.LoggerConfig{
+
+		Service: "auth-service",
+		Level:   "info",
+	})
+
+	ctx := logger.WithContext(context.Background(), log)
+
+	log.Info().Msg("starting auth service..")
 
 	app, err := bootstrap.Initialize(ctx)
 	
 	if err != nil {
-		log.Fatalf("Unable to initialize db %v", err)
+		log.Fatal().Err(err).Msg("Unable to initialize application")
 	}
 	defer app.Close()
 
-	log.Println("application initialized successfully")
+	log.Info().Msg("application initialized successfully")
 }
