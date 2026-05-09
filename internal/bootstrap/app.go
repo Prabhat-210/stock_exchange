@@ -17,14 +17,18 @@ type App struct {
 
 func Initialize(ctx context.Context) (*App, error) {
 	log := logger.FromContext(ctx)
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to load configs")
+		log.Error().Msg("Failed to load configs")
 		return nil, err
 	}
-	if err := migrations.Migrate(postgres.DSN(cfg.Postgres), 5); err != nil {
+
+	if err := migrations.Migrate(postgres.DSN(cfg.Postgres), cfg.Postgres.MigrationVersion); err != nil {
+		log.Error().Msg("Failed to run migrate scripts")
 		return nil, err
 	}
+
 	db, err := postgres.NewPool(ctx, cfg.Postgres)
 	if err != nil {
 		log.Error().Msg("Failed to intialize postgres")
