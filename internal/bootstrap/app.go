@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"context"
+	"userAuth/internal/platform/config"
 	"userAuth/internal/platform/logger"
 	"userAuth/internal/platform/postgres"
 
@@ -16,10 +17,15 @@ type App struct {
 
 func Initialize(ctx context.Context) (*App, error) {
 	log := logger.FromContext(ctx)
-	if err := migrations.Migrate(postgres.DSN(), 5); err != nil {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to load configs")
 		return nil, err
 	}
-	db, err := postgres.NewPool(ctx)
+	if err := migrations.Migrate(postgres.DSN(cfg.Postgres), 5); err != nil {
+		return nil, err
+	}
+	db, err := postgres.NewPool(ctx, cfg.Postgres)
 	if err != nil {
 		log.Error().Msg("Failed to intialize postgres")
 		return nil, err

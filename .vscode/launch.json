@@ -10,7 +10,12 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/cmd/api"
+            "program": "${workspaceFolder}/cmd/api",
+            "env": {
+                "POSTGRES_USER":"postgres",
+                "POSTGRES_DB":"postgres",
+                "POSTGRES_PASSWORD":"postgres"
+            }
         }
     ]
 }

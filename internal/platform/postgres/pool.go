@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"userAuth/internal/platform/config"
 	"userAuth/internal/platform/logger"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -18,20 +19,19 @@ Instead of opening a new DB connection for every query, pgxpool.Pool:
 So your app talks to the pool.
 ---------------------------------------------------------------------
 */
-func NewPool(ctx context.Context) (*pgxpool.Pool, error) {
+func NewPool(ctx context.Context, pgConfig config.PostgresConfig) (*pgxpool.Pool, error) {
 	log := logger.FromContext(ctx)
-	cfg, err := pgxpool.ParseConfig(DSN())
+	cfg, err := pgxpool.ParseConfig(DSN(pgConfig))
 	if err != nil {
 		return nil, fmt.Errorf("parse postgres config: %w", err)
 	}
 
-	//TODO: need to set
-	cfg.MaxConns = 25
-	cfg.MinConns = 5
-	cfg.MaxConnLifetime = 30 * time.Minute
-	cfg.MaxConnIdleTime = 10 * time.Minute
-	cfg.HealthCheckPeriod = 1 * time.Minute
-	cfg.ConnConfig.ConnectTimeout = 5 * time.Second
+	cfg.MaxConns = pgConfig.MaxConns
+	cfg.MinConns = pgConfig.MinConns
+	cfg.MaxConnLifetime = time.Duration(pgConfig.MaxConnLifetimeMinute) * time.Minute
+	cfg.MaxConnIdleTime = time.Duration(pgConfig.MaxConnIdleTimeMinute) * time.Minute
+	cfg.HealthCheckPeriod = time.Duration(pgConfig.HealthCheckPeriodMinute) * time.Minute
+	cfg.ConnConfig.ConnectTimeout = time.Duration(pgConfig.ConnectTimeoutSec) * time.Second
 
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
@@ -49,6 +49,13 @@ func NewPool(ctx context.Context) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func DSN() string { //data source name
-	return "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+func DSN(p config.PostgresConfig) string { //data source name
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		p.User,
+		p.Password,
+		p.Host,
+		p.Port,
+		p.Database,
+		p.SSLMode,
+	)
 }

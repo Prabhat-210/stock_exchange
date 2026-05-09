@@ -9,7 +9,7 @@ import (
 func main() {
 
 	log := logger.NewLogger(logger.LoggerConfig{
-		Env: "DEV",
+		Env:     "DEV",
 		Service: "auth-service",
 		Level:   "info",
 	})
