@@ -7,6 +7,8 @@ import (
 	"userAuth/internal/platform/postgres"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"userAuth/internal/platform/migrations"
 )
 
 type App struct {
@@ -15,10 +17,12 @@ type App struct {
 
 func Initialize(ctx context.Context) (*App, error) {
 	log := logger.FromContext(ctx)
-
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to load configs")
+		return nil, err
+	}
+	if err := migrations.Migrate(postgres.DSN(cfg.Postgres), 5); err != nil {
 		return nil, err
 	}
 	db, err := postgres.NewPool(ctx, cfg.Postgres)
