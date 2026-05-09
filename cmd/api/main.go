@@ -9,7 +9,7 @@ import (
 func main() {
 
 	log := logger.NewLogger(logger.LoggerConfig{
-
+		Env: "DEV",
 		Service: "auth-service",
 		Level:   "info",
 	})
@@ -19,6 +19,7 @@ func main() {
 	log.Info().Msg("starting auth service..")
 
 	app, err := bootstrap.Initialize(ctx)
+	
 	if err != nil {
 		log.Fatal().Err(err).Msg("Unable to initialize application")
 	}
