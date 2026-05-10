@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS auth.users (
     id UUID PRIMARY KEY,
+    user_name VARCHAR(80) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     is_email_verified BOOLEAN NOT NULL DEFAULT FALSE,
