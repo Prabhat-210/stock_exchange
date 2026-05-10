@@ -18,7 +18,7 @@ func main() {
 
 	log := logger.NewLogger(logger.LoggerConfig{
 		Env:     cfg.Environment,
-		Service: cfg.Environment,
+		Service: cfg.ServiceName,
 		Level:   cfg.Level,
 	})
 
