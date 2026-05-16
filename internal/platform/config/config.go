@@ -4,6 +4,7 @@ import "github.com/caarlos0/env/v11"
 
 type Config struct {
 	ServiceName string         `env:"SERVICE_NAME" envDefault:"auth-service"`
+	Port        string         `env:"PORT" envDefault:":8080"`
 	Environment string         `env:"ENVIRONMENT" envDefault:"DEV"`
 	Level       string         `env:"LEVEL" envDefault:"info"`
 	Postgres    PostgresConfig `envPrefix:"POSTGRES_"`

@@ -21,18 +21,19 @@ func main() {
 		Service: cfg.ServiceName,
 		Level:   cfg.Level,
 	})
-
 	log.Info().Interface("config", cfg).Msg("Service started, loaded configs :")
-
 	ctx := logger.WithContext(context.Background(), log)
 
 	app, err := bootstrap.Initialize(ctx, cfg)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Unable to initialize application")
-		os.Exit(1)
 	}
 
 	defer app.Close()
 
 	log.Info().Msg("application initialized successfully")
+	
+	if err := app.Server.Listen(cfg.Port); err != nil {
+		log.Fatal().Err(err).Msg("failed to start http server")
+	}
 }
