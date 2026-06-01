@@ -1,9 +1,11 @@
 package migrations
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"fmt"
+	"userAuth/internal/platform/logger"
 
 	"github.com/golang-migrate/migrate/v4"
 	mpostgres "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -15,7 +17,8 @@ import (
 //go:embed migrations/*.sql
 var migrationFiles embed.FS
 
-func Migrate(dsn string, targetVersion uint) error {
+func Migrate(ctx context.Context, dsn string, targetVersion uint) error {
+	log := logger.FromContext(ctx)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return fmt.Errorf("open migration db: %w", err)
@@ -61,6 +64,7 @@ func Migrate(dsn string, targetVersion uint) error {
 
 	step := int(targetVersion) - int(currentVersion)
 	if step == 0 {
+		log.Warn().Msgf("Migration targetVersion: %d, Migration currentVersion: %d", targetVersion, currentVersion )
 		return nil
 	}
 

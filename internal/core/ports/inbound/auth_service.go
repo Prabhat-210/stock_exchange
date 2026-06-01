@@ -1,5 +1,7 @@
 package inboundPort
 
+import "userAuth/internal/core/models"
+
 type AuthService interface {
-	Login(email, password string) (string, error)
+	Login(email, password string) (*models.AuthToken, error)
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	requestDTO "userAuth/internal/adapters/inbound/http/request_DTO"
+	responseDTO "userAuth/internal/adapters/inbound/http/response"
 	inboundPort "userAuth/internal/core/ports/inbound"
 
 	"github.com/gofiber/fiber/v2"
@@ -31,7 +32,7 @@ func (h *AuthHandler) HandleLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	_, err := h.authService.Login(req.Email, req.Password)
+	token, err := h.authService.Login(req.Email, req.Password)
 	if err != nil {
 		h.log.Err(err).Str("Email", req.Email).Msg("Login Failed")
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -39,7 +40,13 @@ func (h *AuthHandler) HandleLogin(c *fiber.Ctx) error {
 		})
 	}
 
+	resp := responseDTO.LoginResponse{
+		AccessToken: token.AccessToken,
+		TokenType: token.TokenType,
+		ExpiresIn: token.ExpiresIn,
+	}
+
 	h.log.Info().Str("email", req.Email).Msg("Login successful")
 
-	return c.Status(fiber.StatusOK).JSON("Sucess")
+	return c.Status(fiber.StatusOK).JSON(resp)
 }

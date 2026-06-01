@@ -5,6 +5,7 @@ import (
 	handler "userAuth/internal/adapters/inbound/http/handlers"
 	server "userAuth/internal/adapters/inbound/http/httpserver"
 	"userAuth/internal/adapters/inbound/http/routes"
+	"userAuth/internal/adapters/outbound/postgress/repository"
 	authService "userAuth/internal/core/service/auth"
 	"userAuth/internal/platform/config"
 	"userAuth/internal/platform/logger"
@@ -24,7 +25,7 @@ type App struct {
 func Initialize(ctx context.Context, cfg *config.Config) (*App, error) {
 	log := logger.FromContext(ctx)
 
-	if err := migrations.Migrate(postgres.DSN(cfg.Postgres), cfg.Postgres.MigrationVersion); err != nil {
+	if err := migrations.Migrate(ctx, postgres.DSN(cfg.Postgres), cfg.Postgres.MigrationVersion); err != nil {
 		log.Error().Msg("Failed to run migrate scripts")
 		return nil, err
 	}
@@ -38,7 +39,8 @@ func Initialize(ctx context.Context, cfg *config.Config) (*App, error) {
 	log.Info().Msg("Postgres initialized successfully")
 
 	//todo:repository
-	authSvc := authService.NewAuthService(log)
+	userRepo := repository.NewUserRepository(db)
+	authSvc := authService.NewAuthService(log, userRepo)
 	
 	authHandle := handler.NewAuthHandler(authSvc, log)
 
