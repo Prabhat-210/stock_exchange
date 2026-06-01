@@ -3,7 +3,6 @@ package authService
 import (
 	"errors"
 	"userAuth/internal/core/models"
-	"userAuth/internal/platform/security"
 )
 
 var ErrInvalidCredentials = errors.New("invalid credentials")
@@ -19,10 +18,9 @@ func (s *AuthService) Login(email, password string) (*models.AuthToken, error) {
 		return nil, ErrInvalidCredentials
 	}
 
-	token, err := security.GenerateToken(u.ID, u.Email)
+	token, err := generateToken(u.ID, u.Email)
 	if err != nil {
 		return nil, err
 	}
 	return token, nil
 }
-
