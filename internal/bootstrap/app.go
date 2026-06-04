@@ -41,7 +41,7 @@ func Initialize(ctx context.Context, cfg *config.Config) (*App, error) {
 	//todo:repository
 	userRepo := repository.NewUserRepository(db)
 	authSvc := authService.NewAuthService(log, userRepo)
-	
+
 	authHandle := handler.NewAuthHandler(authSvc, log)
 
 	server := server.NewServer()

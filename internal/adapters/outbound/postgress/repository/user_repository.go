@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"userAuth/internal/core/ports/outbound"
 	"userAuth/internal/core/domain/user"
+	"userAuth/internal/core/ports/outbound"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -56,4 +56,39 @@ func (r *userRepository) GetByEmail(email string) (*user.User, error) {
 	}
 
 	return &u, nil
+}
+
+func (r *userRepository) Save(req *user.User) error {
+	query := `
+		INSERT INTO auth.users (
+    		id,
+    		email,
+   			user_name,
+    		password_hash
+		)
+		VALUES (
+    		$1,
+   			$2,
+   			$3,
+    		$4
+		)
+		RETURNING id;
+	`
+
+	// var user user.User
+	var userID string
+
+	err := r.db.QueryRow(
+		context.Background(),
+		query,
+		req.ID,
+		req.Email,
+		req.Username,
+		req.PasswordHash,
+	).Scan(&userID)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
